@@ -24,9 +24,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import javax.swing.JOptionPane;
 
 public class Juego extends JFrame implements Runnable, KeyListener,
         MouseListener, MouseMotionListener {
@@ -66,6 +69,7 @@ public class Juego extends JFrame implements Runnable, KeyListener,
     private int score;
     private int state;
     private int nivel;
+    private String nombre; //nombre del jugador
 
     private float getVelUsb(int nivel) {
         return (float) (3 + nivel);
@@ -168,7 +172,7 @@ public class Juego extends JFrame implements Runnable, KeyListener,
      *
      */
     public void run() {
-        //Guarda el tiempo actual del sistema
+        //marda el tiempo actual del sistema
         tiempoActual = System.currentTimeMillis();
 
         while (true) {
@@ -241,22 +245,20 @@ public class Juego extends JFrame implements Runnable, KeyListener,
         }
 
     }
-
-    /*
-     //si se presiono la tecla para guardar
-     try { //se intenta guardar
-     guardar("saveFile.txt"); // se guarda el juego
-     } catch (IOException ex) { //si no se pudo se muestra el error
-     System.out.println("Error al guardar: " + ex);
-     }
-        
-     //si se presiono la tecla para guardar
-     try { //se intenta cargar
-     cargar("saveFile.txt"); // se carga el juego
-     } catch (FileNotFoundException ex) {//si no se pudo se muestra el error
-     System.out.println("Error al guardar: " + ex);
-     }
-     */
+    
+    private void morir() {
+        state = MUERTO;
+        bird.setVelY(0);
+        nombre = JOptionPane.showInputDialog(this, "Ingresa tu nombre:", "");
+        try { //se intenta guardar
+            List<String> scores = cargar("src/flappy/saveFile.txt");
+            scores.add(nombre + " - " + score);
+            guardar("src/flappy/saveFile.txt", scores); // se guarda el juego
+        } catch (IOException ex) { //si no se pudo se muestra el error
+            System.out.println("Error al guardar: " + ex);
+        }
+    }
+    
     /**
      * Metodo usado para checar las colisiones del objeto bola y canasta con las
      * orillas del <code>Applet</code>.
@@ -264,8 +266,7 @@ public class Juego extends JFrame implements Runnable, KeyListener,
     public void checaColision() {
         if (state == VIVO) {
             if (bird.getPosY() + bird.getImageIcon().getIconHeight() >= getHeight() || bird.getPosY() <= 0) {
-                state = MUERTO;
-                bird.setVelY(0);
+                morir();
             }
             if (arriba.peekFirst().getPosX() + arriba.peekFirst().getAncho() <= 0) {
                 insertaUsbs(getWidth() + separacionColumnas);
@@ -274,13 +275,12 @@ public class Juego extends JFrame implements Runnable, KeyListener,
             }
             for (Usb usb : arriba) {
                 if (bird.intersecta(usb)) {
-                    state = MUERTO;
-                    bird.setVelY(0);
+                    morir();
                 }
             }
             for (Usb usb : abajo) {
                 if (bird.intersecta(usb)) {
-                    state = MUERTO;
+                    morir();
                 }
             }
         } else if (state == MUERTO) {
@@ -491,35 +491,32 @@ public class Juego extends JFrame implements Runnable, KeyListener,
         }
     }
 
-    private void guardar(String nombreArchivo) throws IOException {
+    private void guardar(String nombreArchivo, List<String> scores) throws IOException {
         File file = new File(nombreArchivo); // crea un objeto archivo a partir del nombre dado
         if (!file.exists()) { //si no existe el archivo, lo crea
             file.createNewFile();
         }
         try (PrintWriter writer = new PrintWriter(file, "UTF-8")) { //crea un escritor que se autocierra
-            //guarda todas las variables del juego en un archivo de texto
-            //writer.println(...);
-
-            //se guardan los objetos bola y canasta
-            bird.guardar(writer);
+            for(String score : scores) {
+                writer.println(score);
+            }
         }
     }
 
-    private void cargar(String nombreArchivo) throws FileNotFoundException {
+    private List<String> cargar(String nombreArchivo) throws FileNotFoundException {
         File file = new File(nombreArchivo);
         if (!file.exists()) { //si no existe el archivo
             throw new FileNotFoundException(); //tira una excepcion
         }
+        
+        List<String> scores = new ArrayList<>();
 
-        //si hay sonidos, se detienen
-        joy.stop();
-        sad.stop();
         try (Scanner scanner = new Scanner(file)) { //crea un lector que se autocierra
-            //se cargan todas las variables del juego de un archivo de texto
-
-            //... = Boolean.parseBoolean(...);
-            //se cargan los objetos bola y canasta
-            bird.cargar(scanner);
+            while(scanner.hasNextLine()) {
+                scores.add(scanner.nextLine());
+            }
         }
+        
+        return scores;
     }
 }
