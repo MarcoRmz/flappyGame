@@ -6,7 +6,6 @@
  * @date 02/28/14
  * @version 1.3
  */
-
 package flappy;
 
 import java.awt.Color;
@@ -35,39 +34,55 @@ public class Juego extends JFrame implements Runnable, KeyListener,
         init();
         start();
     }
-    
+
     // Se declaran las variables.
     //Objetos de la clase Animacion para el manejo de la animación
     private Animacion animaBird;
     private Animacion animaUsb, animaUsb2;
 
     //constantes de dificultad por nivel
-    private static final float[] velSalto = {7, 7.5f, 8};
-    private static final float[] gravedad = {.5f, .55f, .6f};
-    private static final float[] velUsb = {3, 4, 5};
-    private static final int[] min = {220, 210, 200}, max = {580, 590, 600};
-    private static final int[] separacionColumnas = {260, 240, 220};
-    private static final int[] separacion = {240, 220, 200};
-    
+    private static final float velSalto = 7.5f;
+    private static final float gravedad = .55f;
+    private static final int separacionColumnas = 250;
+    private static final int separacion = 220;
+
     //Variables de control de tiempo de la animación
     private long tiempoActual;
 
     private static final long serialVersionUID = 1L;
-    private static final int VIVO = 0, PAUSA = 1, INSTRUCCIONES = 2, MUERTO = 3, NO_EMPEZADO = 4;
-    
+    private static final int VIVO = 0, MUERTO = 1, NO_EMPEZADO = 2, PAUSA = 4, INSTRUCCIONES = 8;
+
     private Image dbImage;	// Imagen a proyectar
     private Image BKG;  //Imagen de fondo
     private Graphics dbg;	// Objeto grafico
     private SoundClip sad;    // Objeto AudioClip
     private SoundClip joy; //Obbjeto AudioClip
-    
+
     private Bird bird;    // Objeto de la clase bola
     private LinkedList<Usb> arriba, abajo;
-    
+
     private boolean salta, restart;
     private int score;
     private int state;
     private int nivel;
+
+    private float getVelUsb(int nivel) {
+        return (float) (3 + nivel);
+    }
+
+    private int getMin(int nivel) {
+        if (nivel > 20) {
+            return 0;
+        }
+        return 200 - nivel * 10;
+    }
+
+    private int getMax(int nivel) {
+        if (nivel > 20) {
+            return 800;
+        }
+        return 600 + nivel * 10;
+    }
 
     /**
      * Metodo <I>init</I> sobrescrito de la clase <code>Applet</code>.<P>
@@ -82,10 +97,9 @@ public class Juego extends JFrame implements Runnable, KeyListener,
         addMouseListener(this);
         addMouseMotionListener(this);
 
-         /*//Se cargan los sonidos.
+        /*//Se cargan los sonidos.
          sad = new SoundClip("sad.wav");
          joy = new SoundClip("joy.wav");*/
-
         //Se cargan las imágenes(cuadros) para la animación de bola y canasta
         Image bird1 = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("bird1.png"));
         Image usb1 = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("usb.png"));
@@ -101,34 +115,35 @@ public class Juego extends JFrame implements Runnable, KeyListener,
 
         startGame();
     }
-    
+
     private void startGame() {
-        
+
         //Crea personaje bola
-        bird = new Bird(getWidth()/4, getHeight()/2, animaBird);
-        bird.setAccelY(gravedad[nivel]);
-        
+        bird = new Bird(getWidth() / 2, getHeight() / 2, animaBird);
+        bird.setPosX(bird.getPosX() - bird.getAncho() / 2);
+        bird.setPosY(bird.getPosY() - bird.getAlto() / 2);
+        bird.setAccelY(gravedad);
+
         arriba = new LinkedList<>();
         abajo = new LinkedList<>();
-        
+
         nivel = 0;
         score = 0;
         state = NO_EMPEZADO; //pone el estado actual a no empezado
-        
-        insertaUsbs(separacionColumnas[nivel]*3);
-        insertaUsbs(separacionColumnas[nivel]*4);
-        insertaUsbs(separacionColumnas[nivel]*5);
-        
-        
+
+        insertaUsbs(separacionColumnas * 3);
+        insertaUsbs(separacionColumnas * 4);
+        insertaUsbs(separacionColumnas * 5);
+
     }
-    
+
     private void insertaUsbs(int x) {
         Random r = new Random();
-        int puntoMedio = r.nextInt(max[nivel]-separacion[nivel]-min[nivel]) + min[nivel] + separacion[nivel]/2;
-        arriba.addLast(new Usb(x, puntoMedio - separacion[nivel]/2 - 800, animaUsb2));
-        abajo.addLast(new Usb(x, puntoMedio + separacion[nivel]/2, animaUsb));
-        arriba.peekLast().setVelX(-velUsb[nivel]);
-        abajo.peekLast().setVelX(-velUsb[nivel]);
+        int puntoMedio = r.nextInt(getMax(nivel) - separacion - getMin(nivel)) + getMin(nivel) + separacion / 2;
+        arriba.addLast(new Usb(x, puntoMedio - separacion / 2 - 800, animaUsb2));
+        abajo.addLast(new Usb(x, puntoMedio + separacion / 2, animaUsb));
+        arriba.peekLast().setVelX(-getVelUsb(nivel));
+        abajo.peekLast().setVelX(-getVelUsb(nivel));
     }
 
     /**
@@ -157,8 +172,10 @@ public class Juego extends JFrame implements Runnable, KeyListener,
 
         while (true) {
             //Checa si la variable bool pausa o instrucciones o guarda es diferente a true para detener el juego
-            actualiza();
-            checaColision();
+            if (state < 3) {
+                actualiza();
+                checaColision();
+            }
             repaint(); // Se actualiza el <code>Applet</code> repintando el contenido.
             try {
                 // El thread se duerme.
@@ -171,8 +188,8 @@ public class Juego extends JFrame implements Runnable, KeyListener,
 
     /**
      * Metodo usado para actualizar la posicion de objetos bola y canasta.
-     * Actualiza animacion de objetos bola y canasta.
-     * Actualiza vidas y bolas caidas.
+     * Actualiza animacion de objetos bola y canasta. Actualiza vidas y bolas
+     * caidas.
      *
      */
     public void actualiza() {
@@ -182,92 +199,91 @@ public class Juego extends JFrame implements Runnable, KeyListener,
 
         //Guarda el tiempo actual
         tiempoActual += tiempoTranscurrido;
-        
-        if(state == VIVO) {
+
+        if (state == VIVO) {
             bird.actualizaPosicion();
             boolean cambioNivel = false;
-            for(Usb usb : arriba) {
+            for (Usb usb : arriba) {
                 usb.actualizaPosicion();
-                if(!usb.haIncrementadoScore() && usb.getPosX() + usb.getAncho()/2 <= bird.getPosX() + bird.getAncho()/2) {
+                if (!usb.haIncrementadoScore() && usb.getPosX() + usb.getAncho() / 2 <= bird.getPosX() + bird.getAncho() / 2) {
                     usb.incrementarScore();
                     score++;
-                    if(score == 10 || score == 20) {
+                    if (score == 10 || score == 20) {
                         nivel++;
-                        for(Usb usb2 : arriba) {
-                            usb2.setVelX(-velUsb[nivel]);
+                        for (Usb usb2 : arriba) {
+                            usb2.setVelX(-getVelUsb(nivel));
                         }
-                        for(Usb usb2 : abajo) {
-                            usb2.setVelX(-velUsb[nivel]);
+                        for (Usb usb2 : abajo) {
+                            usb2.setVelX(-getVelUsb(nivel));
                         }
                     }
                 }
             }
-            if(cambioNivel) {
+            if (cambioNivel) {
                 arriba.pollLast();
                 abajo.pollLast();
             }
-            for(Usb usb : abajo) {
+            for (Usb usb : abajo) {
                 usb.actualizaPosicion();
             }
-            if(salta) {
+            if (salta) {
                 salta = false;
                 bird.salta();
-                bird.setVelY(-velSalto[nivel]);
+                bird.setVelY(-velSalto);
             }
-        } else if(state == MUERTO) {
+        } else if (state == MUERTO) {
             bird.actualizaPosicion();
-            if(restart) {
+            if (restart) {
                 restart = false;
                 startGame();
             }
         }
-        
-    }
-    
-    /*
-    //si se presiono la tecla para guardar
-            try { //se intenta guardar
-                guardar("saveFile.txt"); // se guarda el juego
-            } catch (IOException ex) { //si no se pudo se muestra el error
-                System.out.println("Error al guardar: " + ex);
-            }
-        
-        //si se presiono la tecla para guardar
-            try { //se intenta cargar
-                cargar("saveFile.txt"); // se carga el juego
-            } catch (FileNotFoundException ex) {//si no se pudo se muestra el error
-                System.out.println("Error al guardar: " + ex);
-            }
-    */
 
+    }
+
+    /*
+     //si se presiono la tecla para guardar
+     try { //se intenta guardar
+     guardar("saveFile.txt"); // se guarda el juego
+     } catch (IOException ex) { //si no se pudo se muestra el error
+     System.out.println("Error al guardar: " + ex);
+     }
+        
+     //si se presiono la tecla para guardar
+     try { //se intenta cargar
+     cargar("saveFile.txt"); // se carga el juego
+     } catch (FileNotFoundException ex) {//si no se pudo se muestra el error
+     System.out.println("Error al guardar: " + ex);
+     }
+     */
     /**
      * Metodo usado para checar las colisiones del objeto bola y canasta con las
      * orillas del <code>Applet</code>.
      */
     public void checaColision() {
-        if(state == VIVO) {
-            if(bird.getPosY() + bird.getImageIcon().getIconHeight() >= getHeight()) {
+        if (state == VIVO) {
+            if (bird.getPosY() + bird.getImageIcon().getIconHeight() >= getHeight() || bird.getPosY() <= 0) {
                 state = MUERTO;
                 bird.setVelY(0);
             }
-            if(arriba.peekFirst().getPosX() + arriba.peekFirst().getAncho() <= 0) {
-                insertaUsbs(getWidth() + separacionColumnas[nivel]);
+            if (arriba.peekFirst().getPosX() + arriba.peekFirst().getAncho() <= 0) {
+                insertaUsbs(getWidth() + separacionColumnas);
                 arriba.pollFirst();
                 abajo.pollFirst();
             }
-            for(Usb usb : arriba) {
-                if(bird.intersecta(usb)) {
+            for (Usb usb : arriba) {
+                if (bird.intersecta(usb)) {
                     state = MUERTO;
                     bird.setVelY(0);
                 }
             }
-            for(Usb usb : abajo) {
-                if(bird.intersecta(usb)) {
+            for (Usb usb : abajo) {
+                if (bird.intersecta(usb)) {
                     state = MUERTO;
                 }
             }
-        } else if(state == MUERTO) {
-            if(bird.getPosY() + bird.getImageIcon().getIconHeight() >= getHeight()) {
+        } else if (state == MUERTO) {
+            if (bird.getPosY() + bird.getImageIcon().getIconHeight() >= getHeight()) {
                 bird.setAccelY(0);
                 bird.setPosY(getHeight() - bird.getImageIcon().getIconHeight());
             }
@@ -309,9 +325,20 @@ public class Juego extends JFrame implements Runnable, KeyListener,
      * @param e es el <code>evento</code> generado al presionar las teclas.
      */
     public void keyPressed(KeyEvent e) {
-        if(state == MUERTO) {
-            if(e.getKeyCode() == KeyEvent.VK_R) {
+        if (state == MUERTO) {
+            if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                 restart = true;
+            }
+        } else if (state == VIVO && e.getKeyCode() == KeyEvent.VK_SPACE) {
+            if (bird.getPosY() > 0) {
+                salta = true;
+            }
+        }
+        if (e.getKeyCode() == KeyEvent.VK_P) {
+            if (state < 3) {
+                state += PAUSA;
+            } else if ((state & 4) != 0) {
+                state -= PAUSA;
             }
         }
     }
@@ -351,13 +378,15 @@ public class Juego extends JFrame implements Runnable, KeyListener,
      * sobre la bola.
      */
     public void mousePressed(MouseEvent e) {
-        if(state == NO_EMPEZADO) {
+        if (state == NO_EMPEZADO) {
             state = VIVO;
             salta = true;
-        } else if(state == VIVO) {
-            if(bird.getPosY() > 0) {
+        } else if (state == VIVO) {
+            if (bird.getPosY() > 0) {
                 salta = true;
             }
+        } else if (state == MUERTO) {
+            restart = true;
         }
     }
 
@@ -371,7 +400,7 @@ public class Juego extends JFrame implements Runnable, KeyListener,
      * del mouse y click se vuelve falsa.
      */
     public void mouseReleased(MouseEvent e) {
-        
+
     }
 
     /**
@@ -442,35 +471,34 @@ public class Juego extends JFrame implements Runnable, KeyListener,
      */
     public void paint1(Graphics g) {
         g.clearRect(0, 0, getWidth(), getHeight());
-        if(state == VIVO || state == NO_EMPEZADO || state == MUERTO) {
-            g.drawImage(BKG, 0, 0, null);
-            g.drawImage(bird.getImagenI(), (int)bird.getPosX(), (int)bird.getPosY(), null);
-            for(Usb usb : arriba) {
-                g.drawImage(usb.getImagenI(), (int)usb.getPosX(), (int)usb.getPosY(), null);
-            }
-            
-            for(Usb usb : abajo) {
-                g.drawImage(usb.getImagenI(), (int)usb.getPosX(), (int)usb.getPosY(), null);
-            }
-            
-            g.setColor(Color.white);
-            g.drawString(String.valueOf(score), getWidth()/2 - 20, getHeight()/3);
-            
-            if(state == MUERTO) {
-                g.drawString("Presion R para volver a empezar.", getWidth()/2 - 120, getHeight()/2);
-            }
+        g.drawImage(BKG, 0, 0, null);
+        g.drawImage(bird.getImagenI(), (int) bird.getPosX(), (int) bird.getPosY(), null);
+        for (Usb usb : arriba) {
+            g.drawImage(usb.getImagenI(), (int) usb.getPosX(), (int) usb.getPosY(), null);
+        }
+
+        for (Usb usb : abajo) {
+            g.drawImage(usb.getImagenI(), (int) usb.getPosX(), (int) usb.getPosY(), null);
+        }
+
+        g.setColor(Color.white);
+        g.setFont(new Font("Arial", Font.BOLD, 36));
+        g.drawString(String.valueOf(score), getWidth() / 2 - 20, getHeight() / 3);
+
+        if (state == MUERTO) {
+            g.drawString("Volver a jugar.", getWidth() / 2 - 120, getHeight() / 2);
         }
     }
 
     private void guardar(String nombreArchivo) throws IOException {
         File file = new File(nombreArchivo); // crea un objeto archivo a partir del nombre dado
-        if(!file.exists()) { //si no existe el archivo, lo crea
+        if (!file.exists()) { //si no existe el archivo, lo crea
             file.createNewFile();
         }
         try (PrintWriter writer = new PrintWriter(file, "UTF-8")) { //crea un escritor que se autocierra
             //guarda todas las variables del juego en un archivo de texto
             //writer.println(...);
-            
+
             //se guardan los objetos bola y canasta
             bird.guardar(writer);
         }
@@ -478,18 +506,17 @@ public class Juego extends JFrame implements Runnable, KeyListener,
 
     private void cargar(String nombreArchivo) throws FileNotFoundException {
         File file = new File(nombreArchivo);
-        if(!file.exists()) { //si no existe el archivo
+        if (!file.exists()) { //si no existe el archivo
             throw new FileNotFoundException(); //tira una excepcion
         }
-        
+
         //si hay sonidos, se detienen
         joy.stop();
         sad.stop();
         try (Scanner scanner = new Scanner(file)) { //crea un lector que se autocierra
             //se cargan todas las variables del juego de un archivo de texto
-            
+
             //... = Boolean.parseBoolean(...);
-            
             //se cargan los objetos bola y canasta
             bird.cargar(scanner);
         }
