@@ -26,6 +26,11 @@ public class Bird extends Base {
         super(posX, posY, anima);
     }
     
+    /**
+     * Metodo de acceso que modifica variable de velocidad en y
+     *
+     * @void
+     */
     void salta() {
         setVelY(-3);
     }

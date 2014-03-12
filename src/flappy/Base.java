@@ -136,6 +136,11 @@ public class Base {
         return getPerimetro().intersects(obj.getPerimetro());
     }
     
+    /**
+     * Metodo de acceso que modifica las variables de posicion y velocidad
+     *
+     * @void
+     */
     public void actualizaPosicion() {
         posX += velX;
         posY += velY;
