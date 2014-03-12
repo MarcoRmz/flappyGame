@@ -28,10 +28,22 @@ public class Usb extends Base {
         super(posX, posY, anima);
     }
     
+    /**
+    * Metodo <I>incrementarScore</I>
+    * Se cambia a verdadera la variable incrementoScore.
+    *
+    * @void
+    */
     public void incrementarScore() {
         incrementoScore = true;
     }
     
+    /**
+    * Metodo <I>haIncrementadoScore</I>
+    * Se regresa la variable incrementoScore.
+    *
+    * @return regresa el valor de la variable de tipo <code>bool</code>
+    */
     public boolean haIncrementadoScore() {
         return incrementoScore;
     }
