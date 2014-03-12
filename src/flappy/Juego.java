@@ -42,12 +42,12 @@ public class Juego extends JFrame implements Runnable, KeyListener,
     private Animacion animaUsb, animaUsb2;
 
     //constantes de dificultad por nivel
-    private static final float[] velSalto = {10, 11, 12};
+    private static final float[] velSalto = {7, 7.5f, 8};
     private static final float[] gravedad = {.5f, .55f, .6f};
-    private static final float[] velUsb = {4, 5, 6};
+    private static final float[] velUsb = {3, 4, 5};
     private static final int[] min = {220, 210, 200}, max = {580, 590, 600};
-    private static final int[] separacionColumnas = {240, 240, 240};
-    private static final int[] separacion = {320, 280, 240};
+    private static final int[] separacionColumnas = {260, 240, 220};
+    private static final int[] separacion = {240, 220, 200};
     
     //Variables de control de tiempo de la animación
     private long tiempoActual;
@@ -251,7 +251,7 @@ public class Juego extends JFrame implements Runnable, KeyListener,
                 bird.setVelY(0);
             }
             if(arriba.peekFirst().getPosX() + arriba.peekFirst().getAncho() <= 0) {
-                insertaUsbs((int)arriba.peekFirst().getPosX() + separacionColumnas[nivel]*3);
+                insertaUsbs(getWidth() + separacionColumnas[nivel]);
                 arriba.pollFirst();
                 abajo.pollFirst();
             }
@@ -309,7 +309,6 @@ public class Juego extends JFrame implements Runnable, KeyListener,
      * @param e es el <code>evento</code> generado al presionar las teclas.
      */
     public void keyPressed(KeyEvent e) {
-        System.out.println(state);
         if(state == MUERTO) {
             if(e.getKeyCode() == KeyEvent.VK_R) {
                 restart = true;
