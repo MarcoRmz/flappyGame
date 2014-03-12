@@ -1,3 +1,6 @@
 Alfredo - 0
 Marco - 2
 Nombre - 2
+null - 24
+null - 0
+abc - 17
