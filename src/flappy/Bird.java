@@ -1,10 +1,10 @@
 /**
- * Clase Bola
+ * Clase Bird
  *
  * @author Marco Ramírez A01191344
  * @author Alfredo Altamirano A01191157
- * @date 02/28/14
- * @version 1.3
+ * @date 03/12/14
+ * @version 1.0
  */
 
 package flappy;
@@ -26,7 +26,14 @@ public class Bird extends Base {
         super(posX, posY, anima);
     }
 
-    //hereda javadoc de base
+    /**
+     * Metodo constructor que hereda javadoc de
+     * <code>Base</code>.
+     *
+     * @param writer es <code>posiscion en x</code> del objeto Bola.
+     * @param posY es el <code>posiscion en y</code> del objeto Bola.
+     * @param anima es la <code>animacion</code> del objeto Bola.
+     */
     public void guardar(PrintWriter writer) {
         super.guardar(writer);
         /*writer.println(CONT);

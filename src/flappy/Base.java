@@ -3,8 +3,8 @@
  *
  * @author Marco Ramírez A01191344
  * @author Alfredo Altamirano A01191157
- * @date 02/28/14
- * @version 1.3
+ * @date 03/12/14
+ * @version 1.0
  */
 
 package flappy;
@@ -20,10 +20,10 @@ public class Base {
 
     private float posX;    //posicion en x.       
     private float posY;	//posicion en y.
-    private float velX;
-    private float velY;
-    private float accelX;
-    private float accelY;
+    private float velX; //velocidad en x
+    private float velY; //velocidad en y
+    private float accelX;   //aceleracion en x
+    private float accelY;   //aceleracion en y
     private Animacion animacion;  //animacion del objeto
 
     /**
@@ -156,6 +156,11 @@ public class Base {
         posY = Integer.parseInt(scanner.nextLine());
     }
     
+     /**
+     * Metodo de acceso que modifica variables de posicion y velocidad
+     *
+     * @void
+     */
     public void actualizaPosicion() {
         posX += velX;
         posY += velY;
@@ -163,34 +168,74 @@ public class Base {
         velY += accelY;
     }
     
+    /**
+     * Metodo de acceso que modifica variable de velocidad en x
+     *
+     * @void
+     */
     public void setVelX(float x) {
         velX = x;
     }
     
+    /**
+     * Metodo de acceso que regresa velocidad en x
+     *
+     * @return un float
+     */
     public float getVelX() {
         return velX;
     }
     
+    /**
+     * Metodo de acceso que modifica variable de velocidad en y
+     *
+     * @void
+     */
     public void setVelY(float y) {
         velY = y;
     }
     
+    /**
+     * Metodo de acceso que regresa velocidad en y
+     *
+     * @return un float
+     */
     public float getVelY() {
         return velY;
     }
     
+    /**
+     * Metodo de acceso que modifica variable de aceleracion en x
+     *
+     * @void
+     */
     public void setAccelX(float x) {
         accelX = x;
     }
     
+    /**
+     * Metodo de acceso que regresa aceleracion en x
+     *
+     * @return un float
+     */
     public float getAccelX() {
         return accelX;
     }
     
+    /**
+     * Metodo de acceso que modifica variable de aceleracion en y
+     *
+     * @void
+     */
     public void setAccelY(float y) {
         accelY = y;
     }
     
+    /**
+     * Metodo de acceso que regresa aceleracion en y
+     *
+     * @return un float
+     */
     public float getAccelY() {
         return accelY;
     }

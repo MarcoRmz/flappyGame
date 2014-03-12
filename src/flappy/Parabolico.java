@@ -1,10 +1,10 @@
-/*
- * Juego en JFrame de tiro parabólico
+/**
+ * Clase Parabolico
  *
  * @author Marco Ramírez A01191344
  * @author Alfredo Altamirano A01191157
- * @date 02/28/14
- * @version 1.3
+ * @date 03/12/14
+ * @version 1.0
  */
 
 package flappy;
