@@ -25,30 +25,7 @@ public class Bird extends Base {
     public Bird(int posX, int posY, Animacion anima) {
         super(posX, posY, anima);
     }
-
-    /**
-     * Metodo constructor que hereda javadoc de
-     * <code>Base</code>.
-     *
-     * @param writer es <code>posiscion en x</code> del objeto Bola.
-     * @param posY es el <code>posiscion en y</code> del objeto Bola.
-     * @param anima es la <code>animacion</code> del objeto Bola.
-     */
-    public void guardar(PrintWriter writer) {
-        super.guardar(writer);
-        /*writer.println(CONT);
-        writer.println(velocidadX);
-        writer.println(velocidadY);*/
-    }
-
-    //hereda javadoc de base
-    public void cargar(Scanner scanner) {
-        super.cargar(scanner);
-        /*CONT = Integer.parseInt(scanner.nextLine());
-        velocidadX = Integer.parseInt(scanner.nextLine());
-        velocidadY = Integer.parseInt(scanner.nextLine());*/
-    }
-
+    
     void salta() {
         setVelY(-3);
     }

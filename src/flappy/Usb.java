@@ -27,16 +27,6 @@ public class Usb extends Base {
     public Usb(int posX, int posY, Animacion anima) {
         super(posX, posY, anima);
     }
-
-    //hereda javadoc de base
-    public void guardar(PrintWriter writer) {
-        super.guardar(writer);
-    }
-
-    //hereda javadoc de base
-    public void cargar(Scanner scanner) {
-        super.cargar(scanner);
-    }
     
     public void incrementarScore() {
         incrementoScore = true;
