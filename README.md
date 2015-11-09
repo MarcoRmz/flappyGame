@@ -1,8 +1,9 @@
-Examen Videojuegos
+Activity for VideoGame Class @Tec de Monterrey
+======
 
-Juego en JFrame de FlappyBird
+## Description
+JFrame game of Flappy Bird
 
-
-Marco Ramirez
-
-Alfredo Altamirano
+## Team
+* Marco Ramírez A01191344
+* Alfredo Altamirano A01191157
